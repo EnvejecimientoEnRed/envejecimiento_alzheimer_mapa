@@ -1,6 +1,6 @@
-## Visualización comparativa entre maternidad y fecundidad
+## Mapa con slider para ver evolución de la tasa de mortalidad por alzheimer a nivel provincial en España
 
-Visualización que compara la edad media a la maternidad en el primer hijo con el indicador coyuntural de fecundidad por comunidades autónomas
+Visualización que permite observar cómo evoluciona la tasa de mortalidad por alzheimer (para cada 100.000 personas con 65 años o más) en España a nivel provincial
 
 ## Licencia
 
