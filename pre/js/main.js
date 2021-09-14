@@ -140,7 +140,7 @@ function initMap() {
                         return item;
                     }
                 });
-                return colors(parseInt(data[0].TasaMuj65));
+                return colors(parseInt(data[0].TasaTot65));
             })
             .style('stroke', '#cecece')
             .style('stroke-width', '1px')
