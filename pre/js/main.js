@@ -62,8 +62,7 @@ function createTimeslider(){
 
     sliderRange.oninput = function () {
         let currentValue = parseInt(sliderRange.value);
-        showSliderDate(currentValue);
-        updateMap(currentValue);
+        setNewValue(currentValue);
     }
 }
 
@@ -197,7 +196,7 @@ function updateMap(year) {
                     return item;
                 }
             });
-            return colors(parseInt(data[0].TasaMuj65));
+            return colors(parseInt(data[0].TasaTot65));
         });
 
     setChartCanvas();
