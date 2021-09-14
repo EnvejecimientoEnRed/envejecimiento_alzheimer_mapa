@@ -211,17 +211,33 @@ body, button {
 
         &__legend {
             width: 100%;
-            margin-top: 12px;
+            margin: 12px auto 0px auto;
 
             display: flex;
+            flex-direction: column;
             justify-content: center;     
 
-            
+            width: 180px;
+
+            &--gradient {
+                width: 100%;
+                height: 6px;
+                background-image: linear-gradient(to right, #a7e7e7, #296161);
+            }
+
+            &--data {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+
+                font-size: 0.85em;
+            }
         }
 
         //Visualización
         &__viz {
             height: 420px;
+            margin-top: 12px;
 
             & .tick text {
                 font-family: 'Titillium Web';
@@ -249,14 +265,16 @@ body, button {
             font-size: 0.85em;
 
             .chart__source {
-                margin-right: 16px;
-
                 display: flex;
                 justify-content: space-between;
                 flex-wrap: wrap;
 
                 &--data, &--copyright {
                     margin-top: 8px;
+                }
+
+                &--data {
+                    margin-right: 16px;
                 }
 
                 &--data span {
@@ -470,7 +488,7 @@ body, button {
         .subtitle {
             //El ancho dependerá de la longitud del título > Para que no se pegue con el logo
             //max-width: calc(100% - 100px);
-            width: 100%;
+            max-width: calc(100% - 100px);
         }
     }
 

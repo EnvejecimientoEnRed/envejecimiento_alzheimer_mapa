@@ -6,7 +6,7 @@ function getInTooltip(tooltip) {
 }
 
 function getOutTooltip(tooltip) {
-    tooltip.transition().style('display','none').style('opacity', 0);
+    tooltip.style('display','none').style('opacity', 0);
 }
 
 function positionTooltip(event, tooltip) {

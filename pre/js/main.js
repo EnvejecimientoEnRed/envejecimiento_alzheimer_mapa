@@ -8,6 +8,7 @@ import 'url-search-params-polyfill';
 //Desarrollo del mapa
 import * as d3 from 'd3';
 import * as topojson from 'topojson-client';
+let d3_composite = require("d3-composite-projections");
 
 //Necesario para importar los estilos de forma automática en la etiqueta 'style' del html final
 import '../css/main.scss';
@@ -16,7 +17,8 @@ import '../css/main.scss';
 let tooltip = d3.select('#tooltip');
 
 //Variables para visualización
-let innerData = [], currentYearData = [], mapBlock = d3.select('#mapBlock');
+let innerData = [], mapData = [], currentYearData = [], mapBlock = d3.select('#mapBlock');
+let svg, colors, projection, path;
 
 ///// VISUALIZACIÓN Y LÓGICA ASOCIADA A LA VISUALIZACIÓN /////
 //Lógica del slider
@@ -61,7 +63,7 @@ function createTimeslider(){
     sliderRange.oninput = function () {
         let currentValue = parseInt(sliderRange.value);
         showSliderDate(currentValue);
-        updateMap(map, currentValue);
+        updateMap(currentValue);
     }
 }
 
@@ -76,9 +78,9 @@ function setNewValue() {
     currentValue = sliderRange.value;
 
     showSliderDate(currentValue);
-    updateMap(map, currentValue);
+    updateMap(currentValue);
 
-    if (currentValue == 2021) {
+    if (currentValue == 2019) {
         clearInterval(sliderInterval);
         playButton.style.display = 'inline-block';
         pauseButton.style.display = 'none';
@@ -102,12 +104,11 @@ function initMap() {
         innerData = csv.parse(data);
 
         //Tratamos los polígonos
-        let provincias = topojson.feature(topo, topo.objects['spain-provinces']);
+        mapData = topojson.feature(topo, topo.objects['spain-provinces']);
         
         //Integramos los datos dentro de las provincias
-        provincias.features.map(function(item) {
+        mapData.features.map(function(item) {
             let datosProvincia = innerData.filter(function(subItem) {
-                console.log(subItem);
                 if(subItem.ID_PROV == parseInt(item.properties.cod_prov)){
                     return subItem;
                 }
@@ -115,23 +116,87 @@ function initMap() {
 
             item.properties.data = datosProvincia;
         });
-
-        console.log(provincias);
         
-        //Nos quedamos con un año en concreto > Data
-        currentYearData = innerData.filter(function(item) {
-            if(item['Year'] == '2019') {
-                return item;
-            }
-        });
-
-        let svg = mapBlock.append('svg').attr("height", mapBlock.clientHeight).attr("width", mapBlock.clientWidth);
+        svg = mapBlock.append('svg')
+            .attr("height", parseInt(mapBlock.style('height')))
+            .attr("width", parseInt(mapBlock.style('width')));
         
+        projection = d3_composite.geoConicConformalSpain().scale(2000).fitSize([parseInt(mapBlock.style('width')),parseInt(mapBlock.style('height'))], mapData);
+        path = d3.geoPath(projection);
+
+        colors = d3.scaleLinear()
+            .domain([0,200])
+            .range(['#a7e7e7', '#296161']);
+
+        svg.selectAll('.provincias')
+            .data(mapData.features)
+            .enter()
+            .append('path')
+            .attr('class', 'provincias')
+            .attr('d', path)
+            .style('fill', function(d) {
+                let data = d.properties.data.filter(function(item) {
+                    if(parseInt(item.Year) == currentValue){
+                        return item;
+                    }
+                });
+                return colors(parseInt(data[0].TasaMuj65));
+            })
+            .style('stroke', '#cecece')
+            .style('stroke-width', '1px')
+            .on('mousemove mouseover', function(d,i,e){
+                //Línea diferencial y cambio del polígonos
+                let currentProvince = this;
+                
+                document.getElementsByTagName('svg')[0].removeChild(this);
+                document.getElementsByTagName('svg')[0].appendChild(currentProvince);
+
+                currentProvince.style.stroke = '#000';
+                currentProvince.style.strokeWidth = '1.5px';
+
+                //Elemento HTML > Tooltip (mostrar nombre de provincia, año y tasas para más de 65 años)
+
+                let dato = d.properties.data.filter(function(item) {
+                    if(parseInt(item.Year) == currentValue) {
+                        return item;
+                    }
+                });
+                dato = {total: +dato[0].TasaMuj65.replace(',','.'), hombres: +dato[0].TasaHomTasaTot6565.replace(',','.'), mujeres: +dato[0].TasaMuj65.replace(',','.')};
+                let html = '<p class="chart__tooltip--title">' + d.properties.name + ' (' + currentValue + ')</p>' + '<p class="chart__tooltip--text">Tasa general (65 años o más): ' + numberWithCommas(dato.total.toFixed(1)) + '</p>' + '<p class="chart__tooltip--text">Tasa en hombres (65 años o más): ' + numberWithCommas(dato.hombres.toFixed(1)) + '</p>' + '<p class="chart__tooltip--text">Tasa en mujeres (65 años o más): ' + numberWithCommas(dato.mujeres.toFixed(1)) + '</p>';
+
+                tooltip.html(html);
+
+                //Tooltip
+                getInTooltip(tooltip);                
+                positionTooltip(window.event, tooltip);
+            })
+            .on('mouseout', function(d,i,e) {
+                //Línea diferencial
+                this.style.stroke = '#cecece';
+                this.style.strokeWidth = '1px';
+
+                //Desaparición del tooltip
+                getOutTooltip(tooltip); 
+            })
+
+        //Islas Canarias
+        svg.append('path')
+            .style('fill', 'none')
+            .style('stroke', '#000')
+            .attr('d', projection.getCompositionBorders());
     });
 }
 
 function updateMap(year) {
-    console.log(year);
+    svg.selectAll('.provincias')
+        .style('fill', function(d) {
+            let data = d.properties.data.filter(function(item) {
+                if(parseInt(item.Year) == year){
+                    return item;
+                }
+            });
+            return colors(parseInt(data[0].TasaMuj65));
+        });
 }
 
 //// EJECUCIÓN SLIDER + MAPA /////
