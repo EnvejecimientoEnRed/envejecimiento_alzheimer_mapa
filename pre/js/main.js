@@ -125,7 +125,7 @@ function initMap() {
         path = d3.geoPath(projection);
 
         colors = d3.scaleLinear()
-            .domain([0,200])
+            .domain([0,300])
             .range(['#a7e7e7', '#296161']);
 
         svg.selectAll('.provincias')
@@ -161,7 +161,7 @@ function initMap() {
                         return item;
                     }
                 });
-                dato = {total: +dato[0].TasaMuj65.replace(',','.'), hombres: +dato[0].TasaHomTasaTot6565.replace(',','.'), mujeres: +dato[0].TasaMuj65.replace(',','.')};
+                dato = {total: +dato[0].TasaTot65.replace(',','.'), hombres: +dato[0].TasaHom65.replace(',','.'), mujeres: +dato[0].TasaMuj65.replace(',','.')};
                 let html = '<p class="chart__tooltip--title">' + d.properties.name + ' (' + currentValue + ')</p>' + '<p class="chart__tooltip--text">Tasa general (65 años o más): ' + numberWithCommas(dato.total.toFixed(1)) + '</p>' + '<p class="chart__tooltip--text">Tasa en hombres (65 años o más): ' + numberWithCommas(dato.hombres.toFixed(1)) + '</p>' + '<p class="chart__tooltip--text">Tasa en mujeres (65 años o más): ' + numberWithCommas(dato.mujeres.toFixed(1)) + '</p>';
 
                 tooltip.html(html);
