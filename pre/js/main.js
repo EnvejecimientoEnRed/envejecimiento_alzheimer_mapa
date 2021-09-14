@@ -1,7 +1,9 @@
-import html2canvas from 'html2canvas';
-import { getInTooltip, getOutTooltip, positionTooltip } from './tooltip';
-import { setRRSSLinks } from './rrss';
 import { numberWithCommas, numberWithCommas2 } from './helpers';
+import { setRRSSLinks } from './rrss';
+import { setChartCanvas, setChartCanvasImage } from './canvas-image';
+import { getInTooltip, getOutTooltip, positionTooltip } from './tooltip';
+import { getIframeParams } from './height';
+import './tabs';
 import 'url-search-params-polyfill';
 import * as d3 from 'd3';
 
@@ -18,6 +20,8 @@ let innerData = [], currentData = [], ccaaFirstData = [], ccaaSecondData = [],
 let line, path_1, length_1, path_2, length_2;
 let enr_color_1 = '#296565', circle_color_1 = '#9E9E9E';
 let enr_color_2 = '#e46b4f', circle_color_2 = '#5E5E5E';
+
+///// VISUALIZACIÓN Y LÓGICA ASOCIADA A LA VISUALIZACIÓN /////
 
 initChart();
 
@@ -394,10 +398,6 @@ function animateChart() {
     }, 4000);
 }
 
-document.getElementById('replay').addEventListener('click', function() {
-    updateChart(currentSelected, currentSelected_2, currentSelectedNac);
-});
-
 function initSecondPath(data) {
     path_2 = chart.append("path")
         .data([data])
@@ -477,93 +477,14 @@ function initSecondPath(data) {
 setRRSSLinks();
 
 ///// ALTURA DEL BLOQUE DEL GRÁFICO //////
-function getIframeParams() {
-    const params = new URLSearchParams(window.location.search);
-    const iframe = params.get('iframe');
-
-    if(iframe == 'fijo') {
-        setChartHeight('fijo');
-    } else {
-        setChartHeight();
-    }
-}
-
-///Si viene desde iframe con altura fija, ejecutamos esta función. Si no, los altos son dinámicos a través de PYMJS
-function setChartHeight(iframe_fijo) {
-    if(iframe_fijo) {
-        //El contenedor y el main reciben una altura fija. En este caso, 688 y 656
-        //La altura del gráfico se ajusta más a lo disponible en el main, quitando títulos, lógica, ejes y pie de gráfico
-        document.getElementsByClassName('container')[0].style.height = '680px';
-        document.getElementsByClassName('main')[0].style.height = '648px';
-
-        let titleBlock = document.getElementsByClassName('b-title')[0].clientHeight;
-        let logicBlock = document.getElementsByClassName('chart__logics')[0].clientHeight;
-        let footerBlock = document.getElementsByClassName('chart__footer')[0].clientHeight;
-        let footerTop = 8, containerPadding = 8, marginTitle = 8, marginLogics = 12;
-
-        //Comprobar previamente la altura que le demos al MAIN. El estado base es 588 pero podemos hacerlo más o menos alto en función de nuestros intereses
-
-        let height = 604; //Altura total del main | Cambiar cuando sea necesario > Quitar aquí los ejes: 35 + 27 > 62
-        document.getElementsByClassName('chart__viz')[0].style.height = height - titleBlock - logicBlock - footerBlock - footerTop - containerPadding - marginTitle - marginLogics + 'px';
-    } else {
-        document.getElementsByClassName('main')[0].style.height = document.getElementsByClassName('main')[0].clientHeight + 'px';
-    }    
-}
-
 getIframeParams();
 
 ///// DESCARGA COMO PNG O SVG > DOS PASOS/////
-let innerCanvas;
 let pngDownload = document.getElementById('pngImage');
-
-function setChartCanvas() {
-    html2canvas(document.querySelector("#chartBlock"), {width: document.querySelector("#chartBlock").clientWidth, height: document.querySelector("#chartBlock").clientHeight, imageTimeout: 12000, useCORS: true}).then(canvas => { innerCanvas = canvas; });
-}
-
-function setChartCanvasImage() {    
-    var image = innerCanvas.toDataURL();
-    // Create a link
-    var aDownloadLink = document.createElement('a');
-    // Add the name of the file to the link
-    aDownloadLink.download = 'viz-maternidad-fecundidad.png';
-    // Attach the data to the link
-    aDownloadLink.href = image;
-    // Get the code to click the download link
-    aDownloadLink.click();
-}
 
 pngDownload.addEventListener('click', function(){
     setChartCanvasImage();
 });
-
-///// JUEGO DE PESTAÑAS /////
-//Cambios de pestañas
-let tabs = document.getElementsByClassName('tab');
-let contenidos = document.getElementsByClassName('content');
-
-for(let i = 0; i < tabs.length; i++) {
-    tabs[i].addEventListener('click', function(e) {
-        document.getElementsByClassName('main')[0].scrollIntoView();
-        displayContainer(e.target);
-    });
-}
-
-function displayContainer(elem) {
-    let content = elem.getAttribute('data-target');
-
-    //Poner activo el botón
-    for(let i = 0; i < tabs.length; i++) {
-        tabs[i].classList.remove('active');
-    }
-    elem.classList.add('active');
-
-    //Activar el contenido
-    for(let i = 0; i < contenidos.length; i++) {
-        contenidos[i].classList.remove('active');
-    }
-
-    document.getElementsByClassName(content)[0].classList.add('active');
-}
 
 ///// USO DE SELECTORES //////
 let x, i, j, l, ll, selElmnt, a, b, c;
