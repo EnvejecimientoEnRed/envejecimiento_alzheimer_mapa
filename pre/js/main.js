@@ -184,6 +184,8 @@ function initMap() {
             .style('fill', 'none')
             .style('stroke', '#000')
             .attr('d', projection.getCompositionBorders());
+
+        setChartCanvas();
     });
 }
 
@@ -197,6 +199,8 @@ function updateMap(year) {
             });
             return colors(parseInt(data[0].TasaMuj65));
         });
+
+    setChartCanvas();
 }
 
 //// EJECUCIÓN SLIDER + MAPA /////
