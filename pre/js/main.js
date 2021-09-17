@@ -49,7 +49,7 @@ function createTimeslider(){
 
     /* Los siguientes eventos tienen la capacidad de modificar lo que se muestra en el mapa */
     playButton.onclick = function () {
-        sliderInterval = setInterval(setNewValue,500);
+        sliderInterval = setInterval(setNewValue,1000);
         playButton.style.display = 'none';
         pauseButton.style.display = 'inline-block';    
     }
@@ -107,17 +107,19 @@ function initMap() {
             .key(function(d) { return d.Sexo;})
             .entries(innerData);
 
-        let totalData = [];
-
-        console.log(innerData);
+        let totalData = [], hombresData = [], mujeresData = [];
 
         for(let i = 0; i < innerData.length; i++) {
             if(innerData[i].key == 'Total') {
                 totalData = innerData[i].values.slice();
             }
+            if(innerData[i].key == 'Hombres') {
+                hombresData = innerData[i].values.slice();
+            }
+            if(innerData[i].key == 'Mujeres') {
+                mujeresData = innerData[i].values.slice();
+            }
         }
-
-        console.log(totalData);
         
 
         //Tratamos los polígonos
@@ -125,13 +127,25 @@ function initMap() {
         
         //Integramos los datos dentro de las ccaa
         mapData.features.map(function(item) {
-            let datosCCAA = totalData.filter(function(subItem) {
+            let datosTotalCCAA = totalData.filter(function(subItem) {
+                if(parseInt(subItem['ccaa_num']) == parseInt(item.properties.cartodb_id)){
+                    return subItem;
+                }
+            });
+            let datosHombresCCAA = hombresData.filter(function(subItem) {
+                if(parseInt(subItem['ccaa_num']) == parseInt(item.properties.cartodb_id)){
+                    return subItem;
+                }
+            });
+            let datosMujeresCCAA = mujeresData.filter(function(subItem) {
                 if(parseInt(subItem['ccaa_num']) == parseInt(item.properties.cartodb_id)){
                     return subItem;
                 }
             });
 
-            item.properties.data = datosCCAA;
+            item.properties.total = datosTotalCCAA;
+            item.properties.hombres = datosHombresCCAA;
+            item.properties.mujeres = datosMujeresCCAA;
         });
         
         svg = mapBlock.append('svg')
@@ -142,7 +156,7 @@ function initMap() {
         path = d3.geoPath(projection);
 
         colors = d3.scaleLinear()
-            .domain([0,300])
+            .domain([0,270])
             .range(['#a7e7e7', '#296161']);
 
         svg.selectAll('.ccaa')
@@ -152,34 +166,46 @@ function initMap() {
             .attr('class', 'ccaa')
             .attr('d', path)
             .style('fill', function(d) {
-                let data = d.properties.data.filter(function(item) {
-                    if(parseInt(item.Year) == currentValue){
+                let data = d.properties.total.filter(function(item) {
+                    if(parseInt(item.anyo) == currentValue){
                         return item;
                     }
                 });
-                return colors(parseInt(data[0].TasaTot65));
+                return colors(parseInt(data[0].tasa));
             })
             .style('stroke', '#cecece')
             .style('stroke-width', '1px')
             .on('mousemove mouseover', function(d,i,e){
                 //Línea diferencial y cambio del polígonos
-                let currentProvince = this;
+                let currentCCAA = this;
                 
                 document.getElementsByTagName('svg')[0].removeChild(this);
-                document.getElementsByTagName('svg')[0].appendChild(currentProvince);
+                document.getElementsByTagName('svg')[0].appendChild(currentCCAA);
 
-                currentProvince.style.stroke = '#000';
-                currentProvince.style.strokeWidth = '1.5px';
+                currentCCAA.style.stroke = '#000';
+                currentCCAA.style.strokeWidth = '1.5px';
 
                 //Elemento HTML > Tooltip (mostrar nombre de provincia, año y tasas para más de 65 años)
 
-                let dato = d.properties.data.filter(function(item) {
-                    if(parseInt(item.Year) == currentValue) {
+                let datoTotal = d.properties.total.filter(function(item) {
+                    if(parseInt(item.anyo) == currentValue) {
                         return item;
                     }
                 });
-                dato = {total: +dato[0].TasaTot65.replace(',','.'), hombres: +dato[0].TasaHom65.replace(',','.'), mujeres: +dato[0].TasaMuj65.replace(',','.')};
-                let html = '<p class="chart__tooltip--title">' + d.properties.name + ' (' + currentValue + ')</p>' + '<p class="chart__tooltip--text">Tasa general (65 años o más): ' + numberWithCommas(dato.total.toFixed(1)) + '</p>' + '<p class="chart__tooltip--text">Tasa en hombres (65 años o más): ' + numberWithCommas(dato.hombres.toFixed(1)) + '</p>' + '<p class="chart__tooltip--text">Tasa en mujeres (65 años o más): ' + numberWithCommas(dato.mujeres.toFixed(1)) + '</p>';
+
+                let datoHombres = d.properties.hombres.filter(function(item) {
+                    if(parseInt(item.anyo) == currentValue) {
+                        return item;
+                    }
+                });
+
+                let datoMujeres = d.properties.mujeres.filter(function(item) {
+                    if(parseInt(item.anyo) == currentValue) {
+                        return item;
+                    }
+                });
+
+                let html = '<p class="chart__tooltip--title">' + d.properties.name_1 + ' (' + currentValue + ')</p>' + '<p class="chart__tooltip--text">Tasa general (65 años o más): ' + numberWithCommas(datoTotal[0].tasa) + '</p>' + '<p class="chart__tooltip--text">Tasa en hombres (65 años o más): ' + numberWithCommas(datoHombres[0].tasa) + '</p>' + '<p class="chart__tooltip--text">Tasa en mujeres (65 años o más): ' + numberWithCommas(datoMujeres[0].tasa) + '</p>';
 
                 tooltip.html(html);
 
@@ -209,12 +235,12 @@ function initMap() {
 function updateMap(year) {
     svg.selectAll('.ccaa')
         .style('fill', function(d) {
-            let data = d.properties.data.filter(function(item) {
-                if(parseInt(item.Year) == year){
+            let data = d.properties.total.filter(function(item) {
+                if(parseInt(item.anyo) == year){
                     return item;
                 }
             });
-            return colors(parseInt(data[0].TasaTot65));
+            return colors(parseInt(data[0].tasa));
         });
 
     setChartCanvas();
