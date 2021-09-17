@@ -92,7 +92,7 @@ function showSliderDate(currentValue){
 
 //Lógica del mapa > Por defecto, mostramos el último año con datos (2020)
 function initMap() {
-    const csv = d3.dsvFormat(";");
+    const csv = d3.dsvFormat(",");
 
     let q = d3.queue();
     q.defer(d3.json, "https://raw.githubusercontent.com/EnvejecimientoEnRed/mapa-alzheimer-viz/main/data/ccaa_espana.json");
@@ -102,15 +102,31 @@ function initMap() {
         if (error) throw error;
         innerData = csv.parse(data);
 
-        console.log(topo);
+        //Uso del d3.nest
+        let innerData = d3.nest()
+            .key(function(d) { return d.Sexo;})
+            .entries(innerData);
+
+        let totalData = [];
+
+        console.log(innerData);
+
+        for(let i = 0; i < innerData.length; i++) {
+            if(innerData[i].key == 'Total') {
+                totalData = innerData[i].values.slice();
+            }
+        }
+
+        console.log(totalData);
+        
 
         //Tratamos los polígonos
-        mapData = topojson.feature(topo, topo.objects['spain-provinces']);
+        mapData = topojson.feature(topo, topo.objects['shapefiles_ccaa_espana']);
         
-        //Integramos los datos dentro de las provincias
+        //Integramos los datos dentro de las ccaa
         mapData.features.map(function(item) {
-            let datosCCAA = innerData.filter(function(subItem) {
-                if(subItem['ccaa_num'] == parseInt(item.properties.cod_prov)){
+            let datosCCAA = totalData.filter(function(subItem) {
+                if(parseInt(subItem['ccaa_num']) == parseInt(item.properties.cartodb_id)){
                     return subItem;
                 }
             });
@@ -129,11 +145,11 @@ function initMap() {
             .domain([0,300])
             .range(['#a7e7e7', '#296161']);
 
-        svg.selectAll('.provincias')
+        svg.selectAll('.ccaa')
             .data(mapData.features)
             .enter()
             .append('path')
-            .attr('class', 'provincias')
+            .attr('class', 'ccaa')
             .attr('d', path)
             .style('fill', function(d) {
                 let data = d.properties.data.filter(function(item) {
@@ -191,7 +207,7 @@ function initMap() {
 }
 
 function updateMap(year) {
-    svg.selectAll('.provincias')
+    svg.selectAll('.ccaa')
         .style('fill', function(d) {
             let data = d.properties.data.filter(function(item) {
                 if(parseInt(item.Year) == year){
