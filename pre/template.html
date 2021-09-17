@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-    <title>Evolución de tasa de mortalidad por alzheimer en España a nivel provincial</title>
+    <title>Evolución de tasa de mortalidad por alzheimer en España a nivel autonómico</title>
     <meta name="mrf-extractable" content="false">
     <meta property='og:image' content=''>
-    <meta property="og:title" content="Evolución de tasa de mortalidad por alzheimer en España a nivel provincial">
-    <meta property="og:description" content="Mapa que visualiza la evolución de tasa de mortalidad por alzheimer en España a nivel provincial">
+    <meta property="og:title" content="Evolución de tasa de mortalidad por alzheimer en España a nivel autonómico">
+    <meta property="og:description" content="Mapa que visualiza la evolución de tasa de mortalidad por alzheimer en España a nivel autonómico">
     <meta property="og:image" content="https://raw.githubusercontent.com/EnvejecimientoEnRed/mapa-alzheimer-viz/main/pre/cchs.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Titillium+Web%3A300%2C300italic%2C400%2C400italic%2C500%2C700%2C700italic&#038;subset=latin&#038;ver=5.8' type='text/css' media='all' />
@@ -18,7 +18,7 @@
             <section class="content b-chart active" id="chartBlock">
                 <!-- BLOQUE DE LA VISUALIZACIÓN -->
                 <div class="b-title">
-                    <h1 class="title">Evolución de la tasa de mortalidad por alzheimer en España a nivel provincial</h1>
+                    <h1 class="title">Evolución de la tasa de mortalidad por alzheimer en España a nivel autonómico</h1>
                     <h2 class="subtitle">Gráfico 3/2021. Datos entre 2002 y 2019. Tasa por cada 100.000 personas con 65 años o más</h2>
                 </div>
                 <div class="chart__logics">
@@ -28,7 +28,7 @@
                                 <img id="btnPlay" class="btnControl" src="https://raw.githubusercontent.com/EnvejecimientoEnRed/mapa-alzheimer-viz/main/pre/css/play.svg" width="16px" height="16px" alt="Play">
                                 <img id="btnPause" class="btnControl" src="https://raw.githubusercontent.com/EnvejecimientoEnRed/mapa-alzheimer-viz/main/pre/css/pause.svg" width="16px" height="16px" alt="Pausa">
                             </div>
-                            <p class="slider-text">Dele al play o navegue por la barra para ver la evolución de la tasa de alzheimer por provincias</p>                
+                            <p class="slider-text">Dele al play o navegue por la barra para ver la evolución de la tasa de alzheimer por comunidades autónomas</p>                
                         </div>
                         <div class="slider-container">
                             <input id="slider" class="slider" type="range"> 
@@ -66,7 +66,7 @@
                 </div>
                 <p class="text__paragraph">En este gráfico se ha utilizado una fuente de datos: el Instituto Nacional de Estadística (INE). Dentro de ella, utilizamos dos grupos de datos distintos:</p>
                 <p class="text__paragraph">El primero, <a class="link" href="https://www.ine.es/jaxiT3/Tabla.htm?t=9936&L=0" target="_blank">las defunciones por causas (lista reducida)</a>, que ofrece datos de muertes a partir de una lista reducida de causas. En este caso, nos centramos en la causa 051, que registra la enfermedad de Alzheimer.</p>
-                <p class="text__paragraph">El segundo, <a class="link" href="https://www.ine.es/dynt3/inebase/es/index.htm?padre=1894&capsel=1895" target="_blank">las cifras de población a nivel provincial y por grupo de edad</a>, con el objetivo de conocer la población con 65 años o más en cada provincia durante diferentes años y poder hacer una tasa de mortalidad por alzheimer utilizando este grupo poblacional</p>
+                <p class="text__paragraph">El segundo, <a class="link" href="https://www.ine.es/dynt3/inebase/es/index.htm?padre=1894&capsel=1895" target="_blank">las cifras de población a nivel autonómico y por grupo de edad</a>, con el objetivo de conocer la población con 65 años o más en cada comunidad autónoma durante diferentes años y poder hacer una tasa de mortalidad por alzheimer utilizando este grupo poblacional</p>
             </section>
             <section class="content b-data">
                 <div class="b-title">
@@ -74,7 +74,7 @@
                 </div>
                 <p class="text__header">Descarga de datos</p>
                 <p class="text__paragraph">Los datos procesados en esta visualización los puede encontrar en <a class="link" href="https://github.com/EnvejecimientoEnRed/mapa-alzheimer-viz" target="_blank">este repositorio de Github</a>.</p>
-                <p class="text__paragraph">Si desea descargarlos, puede hacerlo desde <a class="link" href="https://raw.githubusercontent.com/EnvejecimientoEnRed/mapa-alzheimer-viz/main/data/provincias_alzheimer_year.csv" target="_blank">aquí</a>.</p>
+                <p class="text__paragraph">Si desea descargarlos, puede hacerlo desde <a class="link" href="https://raw.githubusercontent.com/EnvejecimientoEnRed/mapa-alzheimer-viz/main/data/ccaa_alzheimer_year.csv" target="_blank">aquí</a>.</p>
                 <p class="text__header">Descargar como PNG</p>
                 <p class="text__paragraph">También puede descargar el gráfico como una imagen .png haciendo click <button class="btn_share" id="pngImage">aquí</button></p> 
                 <p class="text__paragraph">El gráfico se descargará con los últimos filtros que haya utilizado.</p>
