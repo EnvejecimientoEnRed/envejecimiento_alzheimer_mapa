@@ -23,7 +23,7 @@ let svg, colors, projection, path;
 ///// VISUALIZACIÓN Y LÓGICA ASOCIADA A LA VISUALIZACIÓN /////
 //Lógica del slider
 let currentValue = 2019;
-const firstValue = 1990;
+const firstValue = 2002;
 const lastValue = 2019;
 const yearsDifference = (lastValue - firstValue) + 1;
 
@@ -49,7 +49,7 @@ function createTimeslider(){
 
     /* Los siguientes eventos tienen la capacidad de modificar lo que se muestra en el mapa */
     playButton.onclick = function () {
-        sliderInterval = setInterval(setNewValue,300);
+        sliderInterval = setInterval(setNewValue,500);
         playButton.style.display = 'none';
         pauseButton.style.display = 'inline-block';    
     }
@@ -95,25 +95,27 @@ function initMap() {
     const csv = d3.dsvFormat(";");
 
     let q = d3.queue();
-    q.defer(d3.json, "https://raw.githubusercontent.com/EnvejecimientoEnRed/mapa-alzheimer-viz/main/data/spain-provinces-topo.json");
-    q.defer(d3.text, 'https://raw.githubusercontent.com/EnvejecimientoEnRed/mapa-alzheimer-viz/main/data/provincias_alzheimer_year.csv');
+    q.defer(d3.json, "https://raw.githubusercontent.com/EnvejecimientoEnRed/mapa-alzheimer-viz/main/data/ccaa_espana.json");
+    q.defer(d3.text, 'https://raw.githubusercontent.com/EnvejecimientoEnRed/mapa-alzheimer-viz/main/data/ccaa_alzheimer_year.csv');
 
     q.await(function(error, topo, data) {
         if (error) throw error;
         innerData = csv.parse(data);
+
+        console.log(topo);
 
         //Tratamos los polígonos
         mapData = topojson.feature(topo, topo.objects['spain-provinces']);
         
         //Integramos los datos dentro de las provincias
         mapData.features.map(function(item) {
-            let datosProvincia = innerData.filter(function(subItem) {
-                if(subItem.ID_PROV == parseInt(item.properties.cod_prov)){
+            let datosCCAA = innerData.filter(function(subItem) {
+                if(subItem['ccaa_num'] == parseInt(item.properties.cod_prov)){
                     return subItem;
                 }
             });
 
-            item.properties.data = datosProvincia;
+            item.properties.data = datosCCAA;
         });
         
         svg = mapBlock.append('svg')
