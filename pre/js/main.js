@@ -95,8 +95,8 @@ function initMap() {
     const csv = d3.dsvFormat(",");
 
     let q = d3.queue();
-    q.defer(d3.json, "https://raw.githubusercontent.com/EnvejecimientoEnRed/mapa-alzheimer-viz/main/data/ccaa_espana.json");
-    q.defer(d3.text, 'https://raw.githubusercontent.com/EnvejecimientoEnRed/mapa-alzheimer-viz/main/data/ccaa_alzheimer_year.csv');
+    q.defer(d3.json, "https://raw.githubusercontent.com/EnvejecimientoEnRed/envejecimiento_alzheimer_mapa/main/data/ccaa_espana.json");
+    q.defer(d3.text, 'https://raw.githubusercontent.com/EnvejecimientoEnRed/envejecimiento_alzheimer_mapa/main/data/ccaa_alzheimer_year.csv');
 
     q.await(function(error, topo, data) {
         if (error) throw error;
